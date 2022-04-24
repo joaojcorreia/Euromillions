@@ -4,6 +4,19 @@ library(ggthemes)
 
 source('load_data.R')
 
+# gganimate frequency barchart #
+
+
+freq.table.numbers %>% 
+pivot_longer()
+
+
+
+
+
+
+
+
 data.graph <- freq.table.numbers[,c(1,300)]
 
 colnames(data.graph) <- c("N","D")
