@@ -5,10 +5,10 @@ library(tidytext)
 
 source('load_data.R')
 
-# gganimate frequency barchart #
+# prepare data - pivot longer and create rank column #
 
 
-freq.table.numbers.2 <- freq.table.numbers[]
+freq.table.numbers.2 <- freq.table.numbers[,1:50]
 
 
 freq.table.numbers.2 <- freq.table.numbers.2 %>% 
@@ -22,6 +22,10 @@ freq.table.numbers.2 <- freq.table.numbers.2 %>%
   mutate(ranking = row_number())
 
 
+# load logo png #
+ logo <- png::readPNG('logo euromillions.png')
+
+# create animation # 
 
 animation <- freq.table.numbers.2 %>%
   ggplot() +
@@ -43,6 +47,7 @@ animation <- freq.table.numbers.2 %>%
     plot.title = element_text(size = 20, colour = "darkgray")
   ) +
   labs(title = "{closest_state}")+
+  #annotation_custom("logo", xmin = 0.5, xmax = 1, ymin = 0.5, ymax = 1) +
   transition_states(Date, state_length = 0, transition_length = 1) +
   enter_grow() +
   view_follow()+
