@@ -1,46 +1,54 @@
 library(ggplot2)
 library(gganimate)
 library(ggthemes)
+library(tidytext)
 
 source('load_data.R')
 
 # gganimate frequency barchart #
 
 
-freq.table.numbers <- freq.table.numbers[,c(1,1130:1141)]
+freq.table.numbers.2 <- freq.table.numbers[]
 
 
-l.freq.table.numbers <- freq.table.numbers %>% 
+freq.table.numbers.2 <- freq.table.numbers.2 %>% 
               pivot_longer(!N, names_to = 'Date', values_to = 'Freq')
 
-l.freq.table.numbers$Date <- as.Date(l.freq.table.numbers$Date)
+freq.table.numbers.2$Date <- as.Date(freq.table.numbers.2$Date)
+
+freq.table.numbers.2 <- freq.table.numbers.2 %>%
+  group_by(Date) %>%
+  arrange(Date, desc(Freq)) %>%
+  mutate(ranking = row_number())
 
 
-l.freq.table.numbers %>% 
+
+animation <- freq.table.numbers.2 %>%
   ggplot() +
-  facet_wrap(~Date)+
-  aes(x=Freq, 
-      y=reorder(N, Freq), 
-      fill=N)+
-  geom_bar(stat="identity", width=0.5)+
-  geom_text(aes(label=N), vjust=+0.3 ,hjust=-0.3, size=3)+
-  #coord_cartesian(xlim=c((min(Freq)-0.005),(max(Freq)+0.005)))+
-  theme_fivethirtyeight()+
-  theme(axis.text.y=element_blank(),  
-        axis.ticks.y=element_blank(),
-        legend.position="none"
-  ) -> myplot
+  geom_col(aes(ranking, Freq, fill = N))+
+  geom_text(aes(ranking, y=(Freq) , label = N), vjust=+0.2, hjust=-0.8, size = 3) + 
+  coord_flip()+ 
+  scale_x_reverse() +
+  theme_minimal()+ 
+  theme(
+    panel.grid = element_blank(), 
+    legend.position = "none",
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.title.x = element_blank(),
+    plot.margin = margin(1, 2, 1, 2, "cm"),
+    plot.title = element_text(size = 20, colour = "darkgray")
+  ) +
+  labs(title = "{closest_state}")+
+  transition_states(Date, state_length = 0, transition_length = 1) +
+  enter_grow() +
+  view_follow()+
+  ease_aes('linear') 
 
-myplot+
-  facet_null()+
-  geom_text(x = 0.5 , y = 3,
-            aes(label = as.character(Date)),
-            size = 10, col = "grey18")+
-  aes(group = N)+
-  transition_time(Date) -> p
-
-
-p <- animate(p, duration = 5, fps = 20, width = 1200, height = 800, renderer = gifski_renderer())
+p <- animate(animation, duration = 120, fps = 20, width =1200, height = 800,  renderer = gifski_renderer())
 
 anim_save("out.gif",animation = p, renderer = gifski_renderer())
 
@@ -51,23 +59,6 @@ anim_save("out.gif",animation = p, renderer = gifski_renderer())
 
 
 
-
-
-data.graph <- freq.table.numbers[,c(1,300)]
-
-colnames(data.graph) <- c("N","D")
-
-ggplot(data=data.graph, aes(x=D, 
-                            y=reorder(N, D), 
-                            fill=N))+
-  geom_bar(stat="identity", width=0.5)+
-  geom_text(aes(label=N), vjust=+0.3 ,hjust=-0.3, size=3)+
-  coord_cartesian(xlim=c((min(data.graph$D)-0.005),(max(data.graph$D)+0.005)))+
-  theme_fivethirtyeight()+
-  theme(axis.text.y=element_blank(),  
-        axis.ticks.y=element_blank(),
-        legend.position="none"
-  )
 
 
 
