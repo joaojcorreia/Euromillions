@@ -8,7 +8,7 @@ source('load_data.R')
 # prepare data - pivot longer and create rank column #
 
 
-freq.table.numbers.2 <- freq.table.numbers[,1:50]
+freq.table.numbers.2 <- freq.table.numbers
 
 
 freq.table.numbers.2 <- freq.table.numbers.2 %>% 
